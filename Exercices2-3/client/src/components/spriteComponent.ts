@@ -31,9 +31,10 @@ export class SpriteComponent extends Component<ISpriteComponentDesc> implements 
   private animWaitCounter!: number;
   private descr!: IFrameEntry;
   private spriteSize!: ISize;
-  private vertexBuffer!: WebGLBuffer;
-  private vertices!: Float32Array;
-  private indexBuffer!: WebGLBuffer;
+  public vertexBuffer!: WebGLBuffer;
+  public vertices!: Float32Array;
+  public indexBuffer!: WebGLBuffer;
+  public indices!: Uint16Array;
 
   // ## Méthode *create*
   // Cette méthode est appelée pour configurer le composant avant
@@ -79,8 +80,8 @@ export class SpriteComponent extends Component<ISpriteComponentDesc> implements 
     // ```
     this.indexBuffer = GL.createBuffer()!;
     GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-    const indices = new Uint16Array([0, 1, 2, 2, 3, 0]);
-    GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, indices, GL.DYNAMIC_DRAW);
+    this.indices = new Uint16Array([0, 1, 2, 2, 3, 0]);
+    GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, this.indices, GL.DYNAMIC_DRAW);
 
     // Et on initialise le contenu des vertices
     this.updateMesh();
@@ -107,11 +108,11 @@ export class SpriteComponent extends Component<ISpriteComponentDesc> implements 
   // via la méthode *bind* de la feuille de sprite, sélectionne le
   // tableau de vertices et d'indices et fait l'appel de rendu.
   public display() {
-    GL.bindBuffer(GL.ARRAY_BUFFER, this.vertexBuffer);
-    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-    this.spriteSheet.bind();
-    GL.drawElements(GL.TRIANGLES, 6, GL.UNSIGNED_SHORT, 0);
-    this.spriteSheet.unbind();
+    // GL.bindBuffer(GL.ARRAY_BUFFER, this.vertexBuffer);
+    // GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    // this.spriteSheet.bind();
+    // GL.drawElements(GL.TRIANGLES, 6, GL.UNSIGNED_SHORT, 0);
+    // this.spriteSheet.unbind();
   }
 
   // ## Méthode *updateMesh*
@@ -178,4 +179,5 @@ export class SpriteComponent extends Component<ISpriteComponentDesc> implements 
     GL.bindBuffer(GL.ARRAY_BUFFER, this.vertexBuffer);
     GL.bufferSubData(GL.ARRAY_BUFFER, offset, this.vertices);
   }
+
 }

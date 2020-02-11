@@ -1,7 +1,10 @@
+import * as GraphicsAPI from "../graphicsAPI";
 import { IEntity } from "../entity";
 import { IDisplayComponent } from "../systems/displaySystem";
 import { Component } from "./component";
 import { SpriteComponent } from "./spriteComponent";
+
+let GL: WebGLRenderingContext;
 
 // # Classe *LayerComponent*
 // Ce composant représente un ensemble de sprites qui
@@ -12,11 +15,54 @@ export class LayerComponent extends Component<object> implements IDisplayCompone
   // La méthode *display* est appelée une fois par itération
   // de la boucle de jeu.
   public display(dT: number) {
-    const layerSprites = this.listSprites();
+    const layerSprites = this.listSprites();    
     if (layerSprites.length === 0) {
       return;
     }
+
+    var listVertices = new Float32Array(layerSprites.length * 4);
+    var listIndices = new Uint16Array(layerSprites.length * 6);
+
+    var i: number;
+    var j: number;
+    var k: number;
+
+
+    for(i = 0; i < layerSprites.length; i++) {
+      for(j = 0; j < 4; j++) {
+        listVertices[i+j] = layerSprites[i].vertices[j];
+      }
+
+      for(k = 0; k < layerSprites[i].indices.length; k++) {
+        listIndices[i*layerSprites[i].indices.length + k] = layerSprites[i].indices[k] + i * 4;
+      }
+    }
+
     const spriteSheet = layerSprites[0].spriteSheet;
+
+    var vertexBuffer: WebGLBuffer;
+    var indexBuffer: WebGLBuffer;
+    GL = GraphicsAPI.context;
+
+    vertexBuffer = GL.createBuffer()!;
+    indexBuffer = GL.createBuffer()!;
+
+
+    GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+    GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+    GL.bufferData(GL.ARRAY_BUFFER, listVertices, GL.DYNAMIC_DRAW);
+    GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, listIndices, GL.DYNAMIC_DRAW);
+
+    spriteSheet.bind();
+
+    GL.drawElements(GL.TRIANGLES, listIndices.length, GL.UNSIGNED_SHORT, 0);
+
+    spriteSheet.unbind();
+
+    console.log(listIndices);
+
+    
   }
 
   // ## Fonction *listSprites*
