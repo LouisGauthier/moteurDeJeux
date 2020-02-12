@@ -3,6 +3,7 @@ import { IEntity } from "../entity";
 import { IDisplayComponent } from "../systems/displaySystem";
 import { Component } from "./component";
 import { SpriteComponent } from "./spriteComponent";
+import { TextureComponent } from "./textureComponent";
 
 let GL: WebGLRenderingContext;
 
@@ -20,21 +21,22 @@ export class LayerComponent extends Component<object> implements IDisplayCompone
       return;
     }
 
-    var listVertices = new Float32Array(layerSprites.length * 4);
+    const nbVerticesPerSprite = 4;
+    const spriteVerticesSize = nbVerticesPerSprite * TextureComponent.vertexSize;
+
+    var listVertices = new Float32Array(layerSprites.length * spriteVerticesSize);
     var listIndices = new Uint16Array(layerSprites.length * 6);
 
-    var i: number;
-    var j: number;
-    var k: number;
-
-
-    for(i = 0; i < layerSprites.length; i++) {
-      for(j = 0; j < 4; j++) {
-        listVertices[i+j] = layerSprites[i].vertices[j];
+    // Pour chaque sprite
+    for(var i = 0; i < layerSprites.length; i++) {
+      // Pour chaque float des vertices du sprite (position 3d et coordonnées de texture)
+      for(var j = 0; j < spriteVerticesSize; j++) {
+        listVertices[i * spriteVerticesSize + j] = layerSprites[i].vertices[j];
       }
 
-      for(k = 0; k < layerSprites[i].indices.length; k++) {
-        listIndices[i*layerSprites[i].indices.length + k] = layerSprites[i].indices[k] + i * 4;
+      // Pour chaque indice du sprite
+      for(var k = 0; k < layerSprites[i].indices.length; k++) {
+        listIndices[i * layerSprites[i].indices.length + k] = layerSprites[i].indices[k] + i * nbVerticesPerSprite;
       }
     }
 
@@ -59,9 +61,6 @@ export class LayerComponent extends Component<object> implements IDisplayCompone
     GL.drawElements(GL.TRIANGLES, listIndices.length, GL.UNSIGNED_SHORT, 0);
 
     spriteSheet.unbind();
-
-    console.log(listIndices);
-
     
   }
 
