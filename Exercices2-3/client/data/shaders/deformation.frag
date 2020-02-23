@@ -23,9 +23,8 @@ void main(void) {
     vec4 intensity = intensityTex * uScale;
 
     vec4 deformationTex = texture2D(uDeformation, vTextureCoord + sin(uTime));
-    vec4 deformation = deformationTex * intensity;
+    vec4 deformation = (deformationTex - 0.5) * 2.0 * intensity ;
 
-    gl_FragColor = texture2D(uSampler, vTextureCoord - deformation.xy) ;
-    // gl_FragColor.gb *= 0.5;
+    gl_FragColor = texture2D(uSampler, vTextureCoord + deformation.xy) ;
 }
 
