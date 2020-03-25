@@ -1,3 +1,5 @@
+import { vec3, vec2 } from "gl-matrix";
+
 // ## Classe *Rectangle*
 // Classe pour représenter un rectangle.
 interface IRectangleDesc {
@@ -54,5 +56,15 @@ export class Rectangle {
       (this.yMin >= other.yMax) ||
       (this.yMax <= other.yMin)
     );
+  }
+
+  public contains(point: vec3): boolean {
+    return (point[0] >= this.xMin && point[0] <= this.xMax &&
+            point[1] >= this.yMin && point[1] <= this.yMax);
+  }
+
+  public getCenter(): vec2 {
+    return vec2.fromValues(this.xMin + (this.xMax - this.xMin) / 2,
+                this.yMin + (this.yMax - this.yMin) / 2);
   }
 }
